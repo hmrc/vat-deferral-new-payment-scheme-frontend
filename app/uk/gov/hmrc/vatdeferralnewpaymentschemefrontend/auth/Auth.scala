@@ -17,18 +17,25 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.{AuthProviders, ConfidenceLevel}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
-import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.{ Vrn, RequestSession }
-
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.{JourneySession, RequestSession, Vrn}
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.services.SessionStore
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers.routes
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[AuthImpl])
 trait Auth extends AuthorisedFunctions with AuthRedirects with Results {
   def authorise(action: Request[AnyContent] => Vrn => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent]
+  def authoriseWithJourneySession(action: Request[AnyContent] => Vrn => JourneySession => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent]
   def authoriseForMatchingVrn(action: Request[AnyContent] => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent]
 }
 
 @Singleton
-class AuthImpl @Inject()(val authConnector: AuthConnector, val env: Environment, val config: Configuration, val appConfig: AppConfig) extends Auth {
+class AuthImpl @Inject()(
+  val authConnector: AuthConnector,
+  val env: Environment,
+  val config: Configuration,
+  val appConfig: AppConfig,
+  sessionStore: SessionStore) extends Auth {
 
   def authorise(action: Request[AnyContent] => Vrn => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent] =
     Action.async { implicit request =>
@@ -66,6 +73,52 @@ class AuthImpl @Inject()(val authConnector: AuthConnector, val env: Environment,
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
         case ex => Ok("Error")
+      }
+    }
+
+  def authoriseWithJourneySession(action: Request[AnyContent] => Vrn => JourneySession => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent] =
+    Action.async { implicit request =>
+
+      val currentUrl = {
+        if (env.mode.equals(Mode.Dev)) s"http://${request.host}${request.uri}" else s"${request.uri}"
+      }
+
+      implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSessionAndRequest(request.headers, Some(request.session), Some(request))
+
+      authorised(AuthProviders(GovernmentGateway) and ConfidenceLevel.L200).retrieve(Retrievals.allEnrolments) {
+        enrolments => {
+
+          def getVrnFromEnrolment(serviceKey: String, enrolmentKey: String): Option[Vrn] =
+            for {
+              e <- enrolments.getEnrolment(serviceKey)
+              i <- e.getIdentifier(enrolmentKey)
+            } yield Vrn(i.value)
+
+          def getVrnFromSession: Option[Vrn] = {
+            val sessionVrn = RequestSession.getObject(request.session)
+            sessionVrn match {
+              case Some(sessionVrn) if sessionVrn.isUserEnrolled => Some(Vrn(sessionVrn.vrn))
+              case _ => None
+            }
+          }
+
+          def withJourneySession(vrn: Vrn)= {
+            request.session.get("sessionId").map(sessionId => {
+              sessionStore.get[JourneySession](sessionId, "JourneySession").map {
+                case Some(a) => action(request)(vrn)(a)
+                case _ => Future.successful(Redirect(routes.DeferredVatBillController.get()))
+              }.flatMap(x => x)}).getOrElse(Future.successful(Ok("Session id not set")))
+          }
+
+          (
+            getVrnFromEnrolment("HMRC-MTD-VAT", "VRN") orElse
+            getVrnFromEnrolment("HMCE-VATDEC-ORG", "VATRegNo") orElse
+            getVrnFromSession
+          ).fold(Future.successful(Redirect("enter-vrn")))(vrn => withJourneySession(vrn))
+      }}.recover {
+        case _: NoActiveSession => toGGLogin(currentUrl)
+        case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
+        case ex => Ok(s"Error: $ex")
       }
     }
 

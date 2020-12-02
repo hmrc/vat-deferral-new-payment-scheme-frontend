@@ -1,0 +1,50 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.viewmodel.Month
+@import views.html.helper.CSRF
+
+@this(layout: Layout)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@layout(pageTitle = Some("vat-deferral-new-payment-scheme-frontend")) {
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@messages("when.to.pay.heading")</h1>
+
+
+            <form action="" method="POST">
+                @CSRF.formField(request)
+                <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="28-day" name="when-to-pay" type="radio" value="28">
+                        <label class="govuk-label govuk-radios__label" for="28-day">
+                            @messages("when.to.pay.item1")
+                        </label>
+                    </div>
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input" id="diff-day" name="when-to-pay" type="radio" aria-controls="conditional-contact" aria-expanded="true">
+                        <label class="govuk-label govuk-radios__label" for="diff-day">
+                        @messages("when.to.pay.item2")
+                        </label>
+                    </div>
+                    <div class="govuk-radios__conditional" id="conditional-contact">
+                        <div class="govuk-form-group">
+                            <label class="govuk-label" for="enter-a-day">
+                            @messages("when.to.pay.item3")
+                            </label>
+                            <input class="govuk-input govuk-input--width-2" id="enter-a-day" name="alt-day" type="number"></div>
+                    </div>
+                </div>
+
+
+                <button class="govuk-button button" data-module="govuk-button">@messages("global.button.continue")</button>
+            </form>
+        </div>
+    </div>
+}

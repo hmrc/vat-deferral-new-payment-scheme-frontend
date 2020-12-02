@@ -51,5 +51,10 @@ deferred.vat.bill.payable = Deferred VAT left to pay by 31 March 2022
 
 how.many.months.heading = How many months do you want to pay over?
 
+when.to.pay.heading = When do you want to pay each month?
+when.to.pay.item1 = 28th day of the month or next working day
+when.to.pay.item2 = A different day
+when.to.pay.item3 = Enter a day between 1 and 28
+
 global.button.continue = Continue
 global.button.accept.and.continue = Accept and continue

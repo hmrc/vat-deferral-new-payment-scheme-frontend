@@ -6,7 +6,6 @@
 package uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.mvc._
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
@@ -19,6 +18,7 @@ import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.auth.Auth
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.viewmodel.Month
 import scala.math.BigDecimal.RoundingMode
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.services.SessionStore
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.JourneySession
 
 @Singleton
 class MonthsController @Inject()(
@@ -29,14 +29,22 @@ class MonthsController @Inject()(
   (implicit val appConfig: AppConfig, val serviceConfig: ServicesConfig)
     extends FrontendController(mcc) with I18nSupport {
 
-  val get: Action[AnyContent] = auth.authorise { implicit request =>
-    implicit vrn =>
-      request.session.get("sessionId").map(sessionId => {
-        sessionStore.get[BigDecimal](sessionId, "amount").map {
-          case Some(a) => Ok(howManyMonthsPage(getMonths(a)))
-          case _ => Redirect(routes.DeferredVatBillController.get())
-        }
-      }).getOrElse(Future.successful(Ok("Session id not set")))
+  val get: Action[AnyContent] = auth.authoriseWithJourneySession { implicit request => vrn => journeySession =>
+
+    journeySession.outStandingAmount match {
+      case Some(outStandingAmount) => Future.successful(Ok(howManyMonthsPage(getMonths(outStandingAmount))))
+      case _ => Future.successful(Redirect(routes.DeferredVatBillController.get()))
+    }
+  }
+
+  val post: Action[AnyContent] = auth.authoriseWithJourneySession { implicit request => vrn => journeySession =>
+
+      val months = request.body.asFormUrlEncoded.map(a => a.mapValues(_.last)).flatMap(b => b.get("how-many-months"))
+
+      months.fold(Future.successful(BadRequest("error occured")))(month => {
+        sessionStore.store[JourneySession](journeySession.id, "JourneySession", journeySession.copy(numberOfPaymentMonths = Some(month.toInt)))
+        Future.successful(Redirect(routes.WhenToPayController.get()))
+      })
   }
 
   def getMonths(amount: BigDecimal): Seq[Month] = {

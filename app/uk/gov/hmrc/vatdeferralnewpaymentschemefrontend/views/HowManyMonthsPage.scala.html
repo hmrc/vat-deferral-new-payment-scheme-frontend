@@ -5,6 +5,8 @@
 
 @import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
 @import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.viewmodel.Month
+@import views.html.helper.CSRF
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
 
 @this(layout: Layout)
 
@@ -16,10 +18,13 @@
         <div class="govuk-grid-column-two-thirds">
             <h1 class="govuk-heading-l">@messages("how.many.months.heading")</h1>
 
-            @{months.map(item => {
+            <form action="@controllers.routes.MonthsController.post()" method="POST">
+                @CSRF.formField(request)
+
+            @months.map(item => {
                 <div>
                     <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="2-months" name="how-many-months" type="radio" value="2"></input>
+                    <input class="govuk-radios__input" id="{item.month}-month" name="how-many-months" type="radio" value={item.month}></input>
                     <label class="govuk-label govuk-radios__label govuk-!-padding-top-0 govuk-!-padding-bottom-6" for="2-months">
                     <span class="govuk-body govuk-!-font-size-36">{item.month}</span>
                     months at
@@ -34,11 +39,10 @@
                     </div>
                 </div>
             })
-            }
 
-            <a href="/" class="govuk-button" data-module="govuk-button">
-                @messages("global.button.continue")
-            </a>
+
+            <button class="govuk-button button" data-module="govuk-button">@messages("global.button.continue")</button>
+            </form>
         </div>
     </div>
 }
