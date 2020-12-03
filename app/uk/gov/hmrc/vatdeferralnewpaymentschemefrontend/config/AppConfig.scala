@@ -41,4 +41,7 @@ class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig)
   def ivJourneyResultUrl(journeyId: JourneyId): String = new URI(s"$ivJourneyResultUrl/${journeyId.Id}").toString
 
   val enrolmentStoreUrl = s"${servicesConfig.baseUrl("enrolment-store-proxy")}/enrolment-store-proxy/enrolment-store/enrolments"
+
+  val bavfApiBaseUrl = servicesConfig.baseUrl("bank-account-verification-api")
+  val bavfWebBaseUrl = servicesConfig.baseUrl("bank-account-verification-web")
 }

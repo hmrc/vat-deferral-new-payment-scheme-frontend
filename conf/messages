@@ -56,5 +56,13 @@ when.to.pay.item1 = 28th day of the month or next working day
 when.to.pay.item2 = A different day
 when.to.pay.item3 = Enter a day between 1 and 28
 
+direct.debit.header = The Direct Debit Guarantee
+direct.debit.p1 = This Guarantee is offered by all banks and building societies that accept instructions to pay Direct Debits.
+direct.debit.p2 = If there are any changes to the amount, date or frequency of your Direct Debit HM Revenue & Customs will notify you 10 working days in advance of your account being debited or as otherwise agreed. If you request HM Revenue & Customs to collect a payment, application-complete of the amount and date will be given to you at the time of the request.
+direct.debit.p3 = If an error is made in the payment of your Direct Debit by HM Revenue & Customs or your bank or building society you are entitled to a full and immediate refund of the amount paid from your bank or building society
+direct.debit.p4 = If you receive a refund you are not entitled to, you must pay it back when HM Revenue & Customs asks you to.
+direct.debit.p5 = You can cancel a Direct Debit at any time by simply contacting your bank or building society. Written confirmation may be required. Please also notify us.
+direct.debit.confirm.and.setup = Confirm and set up Direct Debit
+
 global.button.continue = Continue
 global.button.accept.and.continue = Accept and continue

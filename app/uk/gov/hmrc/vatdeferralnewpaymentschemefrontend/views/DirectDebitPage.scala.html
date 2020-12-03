@@ -1,0 +1,33 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
+@import views.html.helper.CSRF
+
+@this(layout: Layout)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@layout(pageTitle = Some("vat-deferral-new-payment-scheme-frontend")) {
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">@messages("direct.debit.header")</h1>
+            <p>@messages("direct.debit.p1")</p>
+            <p>@messages("direct.debit.p2")</p>
+            <p>@messages("direct.debit.p3")</p>
+            <p>@messages("direct.debit.p4")</p>
+            <p>@messages("direct.debit.p5")</p>
+            <form action="" method="post" novalidate>
+                @CSRF.formField(request)
+                <button class="govuk-button" data-module="govuk-button">
+                    @messages("direct.debit.confirm.and.setup")
+                </button>
+            </form>
+
+        </div>
+    </div>
+}

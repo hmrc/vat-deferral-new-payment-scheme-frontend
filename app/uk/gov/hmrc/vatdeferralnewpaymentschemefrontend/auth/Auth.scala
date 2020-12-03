@@ -63,6 +63,8 @@ class AuthImpl @Inject()(
             }
           }
 
+          Console.println(s"enrolments: $enrolments")
+
           (
             getVrnFromEnrolment("HMRC-MTD-VAT", "VRN") orElse
             getVrnFromEnrolment("HMCE-VATDEC-ORG", "VATRegNo") orElse
@@ -101,6 +103,8 @@ class AuthImpl @Inject()(
               case _ => None
             }
           }
+
+          Console.println(s"enrolments: $enrolments")
 
           def withJourneySession(vrn: Vrn)= {
             request.session.get("sessionId").map(sessionId => {
