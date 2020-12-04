@@ -39,7 +39,7 @@ class MonthsController @Inject()(
 
   val post: Action[AnyContent] = auth.authoriseWithJourneySession { implicit request => vrn => journeySession =>
 
-      val months = request.body.asFormUrlEncoded.map(a => a.mapValues(_.last)).flatMap(b => b.get("how-many-months"))
+      val months = request.body.asFormUrlEncoded.flatMap(_.mapValues(_.last).get("how-many-months"))
 
       months.fold(Future.successful(BadRequest("error occured")))(month => {
         sessionStore.store[JourneySession](journeySession.id, "JourneySession", journeySession.copy(numberOfPaymentMonths = Some(month.toInt)))

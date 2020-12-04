@@ -32,7 +32,7 @@ class BankDetailsController @Inject()(
 
   def get(journeyId: String): Action[AnyContent] = auth.authoriseWithJourneySession { implicit request => vrn => journeySession =>
       connector.complete(journeyId).map {
-        case Some(r) => Ok(directDebitPage())
+        case Some(r) => Ok(directDebitPage(journeyId))
         case None => InternalServerError
       }
   }

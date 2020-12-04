@@ -9,7 +9,7 @@
 
 @this(layout: Layout)
 
-@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+@(journeyId: String)(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
 
 @layout(pageTitle = Some("vat-deferral-new-payment-scheme-frontend")) {
 
@@ -21,7 +21,7 @@
             <p>@messages("direct.debit.p3")</p>
             <p>@messages("direct.debit.p4")</p>
             <p>@messages("direct.debit.p5")</p>
-            <form action="" method="post" novalidate>
+            <form action="@controllers.routes.BankDetailsController.post(journeyId)" method="post" novalidate>
                 @CSRF.formField(request)
                 <button class="govuk-button" data-module="govuk-button">
                     @messages("direct.debit.confirm.and.setup")

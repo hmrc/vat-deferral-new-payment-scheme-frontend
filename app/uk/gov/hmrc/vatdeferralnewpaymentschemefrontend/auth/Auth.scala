@@ -55,15 +55,8 @@ class AuthImpl @Inject()(
               i <- e.getIdentifier(enrolmentKey)
             } yield Vrn(i.value)
 
-          def getVrnFromSession: Option[Vrn] = {
-            val sessionVrn = RequestSession.getObject(request.session)
-            sessionVrn match {
-              case Some(sessionVrn) if sessionVrn.isUserEnrolled => Some(Vrn(sessionVrn.vrn))
-              case _ => None
-            }
-          }
-
-          Console.println(s"enrolments: $enrolments")
+          def getVrnFromSession: Option[Vrn] =
+            RequestSession.getObject(request.session).filter(_.isUserEnrolled).map{x => Vrn(x.vrn)}
 
           (
             getVrnFromEnrolment("HMRC-MTD-VAT", "VRN") orElse
@@ -96,22 +89,16 @@ class AuthImpl @Inject()(
               i <- e.getIdentifier(enrolmentKey)
             } yield Vrn(i.value)
 
-          def getVrnFromSession: Option[Vrn] = {
-            val sessionVrn = RequestSession.getObject(request.session)
-            sessionVrn match {
-              case Some(sessionVrn) if sessionVrn.isUserEnrolled => Some(Vrn(sessionVrn.vrn))
-              case _ => None
-            }
-          }
+          def getVrnFromSession: Option[Vrn] =
+            RequestSession.getObject(request.session).filter(_.isUserEnrolled).map{x => Vrn(x.vrn)}
 
-          Console.println(s"enrolments: $enrolments")
-
-          def withJourneySession(vrn: Vrn)= {
-            request.session.get("sessionId").map(sessionId => {
-              sessionStore.get[JourneySession](sessionId, "JourneySession").map {
+          def withJourneySession(vrn: Vrn): Future[Result] = request.session.get("sessionId") match {
+            case Some(sessionId) =>
+              sessionStore.get[JourneySession](sessionId, "JourneySession").flatMap {
                 case Some(a) => action(request)(vrn)(a)
                 case _ => Future.successful(Redirect(routes.DeferredVatBillController.get()))
-              }.flatMap(x => x)}).getOrElse(Future.successful(Ok("Session id not set")))
+              }
+            case None => Future.successful(Ok("Session id not set"))
           }
 
           (

@@ -9,6 +9,8 @@ import javax.inject.Inject
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.Bavf._
+import HttpReads.Implicits.readRaw
+import InitRequest.writes
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,8 +22,6 @@ class BavfConnector @Inject()(httpClient: HttpClient)(implicit val appConfig: Ap
             implicit ec: ExecutionContext,
             hc: HeaderCarrier
           ): Future[Option[InitResponse]] = {
-    import HttpReads.Implicits.readRaw
-    import InitRequest.writes
 
     val request = InitRequest(
       "vdnps",

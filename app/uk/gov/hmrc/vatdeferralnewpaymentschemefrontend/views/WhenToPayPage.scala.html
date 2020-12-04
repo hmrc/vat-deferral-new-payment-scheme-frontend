@@ -6,6 +6,7 @@
 @import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
 @import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.viewmodel.Month
 @import views.html.helper.CSRF
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
 
 @this(layout: Layout)
 
@@ -18,7 +19,7 @@
             <h1 class="govuk-heading-l">@messages("when.to.pay.heading")</h1>
 
 
-            <form action="" method="POST">
+            <form action="@controllers.routes.WhenToPayController.post()" method="POST">
                 @CSRF.formField(request)
                 <div class="govuk-radios govuk-radios--conditional" data-module="govuk-radios">
                     <div class="govuk-radios__item">
