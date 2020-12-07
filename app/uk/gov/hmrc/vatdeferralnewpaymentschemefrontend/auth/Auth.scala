@@ -67,7 +67,6 @@ class AuthImpl @Inject()(
       }.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok("Error")
       }
     }
 
@@ -109,7 +108,6 @@ class AuthImpl @Inject()(
       }}.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok(s"Error: $ex")
       }
     }
 
@@ -127,7 +125,6 @@ class AuthImpl @Inject()(
       }.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok("Error")
       }
     }
 }
