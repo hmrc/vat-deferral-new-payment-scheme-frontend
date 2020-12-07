@@ -8,6 +8,7 @@ package uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.auth
 import com.google.inject.{ImplementedBy, Inject, Singleton}
 import play.api.{Configuration, Environment, Mode}
 import play.api.mvc._
+import play.api.Logger
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.http.HeaderCarrier
@@ -16,10 +17,11 @@ import uk.gov.hmrc.play.bootstrap.config.AuthRedirects
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.{AuthProviders, ConfidenceLevel}
-import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.{JourneySession, RequestSession, Vrn}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.services.SessionStore
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers.routes
+
 import scala.concurrent.{ExecutionContext, Future}
 
 @ImplementedBy(classOf[AuthImpl])
@@ -35,7 +37,10 @@ class AuthImpl @Inject()(
   val env: Environment,
   val config: Configuration,
   val appConfig: AppConfig,
+  val errorHandler: ErrorHandler,
   sessionStore: SessionStore) extends Auth {
+
+  private val logger = Logger(this.getClass.getSimpleName)
 
   def authorise(action: Request[AnyContent] => Vrn => Future[Result])(implicit ec: ExecutionContext, servicesConfig: ServicesConfig): Action[AnyContent] =
     Action.async { implicit request =>
@@ -57,7 +62,6 @@ class AuthImpl @Inject()(
 
           def getVrnFromSession: Option[Vrn] =
             RequestSession.getObject(request.session).filter(_.isUserEnrolled).map{x => Vrn(x.vrn)}
-
           (
             getVrnFromEnrolment("HMRC-MTD-VAT", "VRN") orElse
             getVrnFromEnrolment("HMCE-VATDEC-ORG", "VATRegNo") orElse
@@ -67,7 +71,10 @@ class AuthImpl @Inject()(
       }.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok("Error")
+        case ex => {
+          logger.error(s"$ex")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
       }
     }
 
@@ -109,7 +116,10 @@ class AuthImpl @Inject()(
       }}.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok(s"Error: $ex")
+        case ex => {
+          logger.error(s"$ex")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
       }
     }
 
@@ -127,7 +137,10 @@ class AuthImpl @Inject()(
       }.recover {
         case _: NoActiveSession => toGGLogin(currentUrl)
         case _: InsufficientConfidenceLevel | _: InsufficientEnrolments => SeeOther(appConfig.ivUrl(currentUrl))
-        case ex => Ok("Error")
+        case ex => {
+          logger.error(s"$ex")
+          InternalServerError(errorHandler.internalServerErrorTemplate)
+        }
       }
     }
 }
