@@ -64,5 +64,15 @@ direct.debit.p4 = If you receive a refund you are not entitled to, you must pay 
 direct.debit.p5 = You can cancel a Direct Debit at any time by simply contacting your bank or building society. Written confirmation may be required. Please also notify us.
 direct.debit.confirm.and.setup = Confirm and set up Direct Debit
 
+confirmation.header = You have set up a Direct Debit for your deferred VAT payments
+confirmation.header2 = What happens next
+confirmation.p1 = We will send you a letter confirming your payment dates. You should get this within 5 working days.
+confirmation.p2 = We will collect your first payment of from your bank account between 28 March 2021 and 31 March 2021.
+confirmation.p3 = After that, we will collect your payments on the 28th day of the month, or the next working day.
+confirmation.summary.page.href = View your payment summary
+confirmation.service.help.header = Get help with this service
+confirmation.p4 = If you have any questions or need to speak to someone about your payments,
+confirmation.vat.helpline.href = contact the VAT helpline
+
 global.button.continue = Continue
 global.button.accept.and.continue = Accept and continue

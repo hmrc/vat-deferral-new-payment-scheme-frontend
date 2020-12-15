@@ -36,4 +36,6 @@ POST        /bank-details/:journeyId uk.gov.hmrc.vatdeferralnewpaymentschemefron
 
 GET        /iv/journey-result        uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers.IVController.get(journeyId: Option[String])
 
+GET        /confirmation       uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers.ConfirmationController.get
+
 GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)

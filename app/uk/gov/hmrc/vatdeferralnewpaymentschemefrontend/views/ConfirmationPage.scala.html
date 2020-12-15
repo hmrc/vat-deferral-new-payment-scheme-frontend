@@ -1,0 +1,37 @@
+@*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ *@
+
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
+
+@this(layout: Layout)
+
+@()(implicit request: Request[_], messages: Messages, appConfig: AppConfig)
+
+@layout(pageTitle = Some("vat-deferral-new-payment-scheme-frontend")) {
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <div class="govuk-panel govuk-panel--confirmation">
+                <h1 class="govuk-panel__title">
+                    @messages("confirmation.header")
+                </h1>
+            </div>
+            <h2 class="govuk-heading-m">@messages("confirmation.header2")</h2>
+            <p class="govuk-body">@messages("confirmation.p1")</p>
+            <p class="govuk-body">@messages("confirmation.p2")</p>
+            <p class="govuk-body">@messages("confirmation.p3").replace("##", "")</p>
+            <p class="govuk-body">
+                <a href="print-summary" class="govuk-link">@messages("confirmation.summary.page.href")</a>
+            </p>
+            <h2 class="govuk-heading-m">@messages("confirmation.service.help.header")</h2>
+            <p class="govuk-body">
+                @messages("confirmation.p4")
+                <a href="https://www.gov.uk/government/organisations/hm-revenue-customs/contact/vat-enquiries">@messages("confirmation.vat.helpline.href")</a>.
+            </p>
+
+        </div>
+    </div>
+}
