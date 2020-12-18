@@ -13,6 +13,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.auth.Auth
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.connectors.{BavfConnector, VatDeferralNewPaymentSchemeConnector}
+import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.Bavf.{BusinessCompleteResponse, PersonalCompleteResponse}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.directdebitarrangement.DirectDebitArrangementRequest
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.services.SessionStore
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.views.html.DirectDebitPage
@@ -53,8 +54,8 @@ class BankDetailsController @Inject()(
     }
 
     connector.complete(journeyId).map {
-      case Some(r) if r.accountType == "personal" => submitDirectDebitArrangement(r.personal.get.sortCode, r.personal.get.accountNumber, r.personal.get.accountName)
-      case Some(r) if r.accountType == "business" => submitDirectDebitArrangement(r.business.get.sortCode, r.business.get.accountNumber, r.business.get.companyName)
+      case Some(r: PersonalCompleteResponse) => submitDirectDebitArrangement(r.sortCode, r.accountNumber, r.accountName)
+      case Some(r: BusinessCompleteResponse) => submitDirectDebitArrangement(r.sortCode, r.accountNumber, r.companyName)
       case None => InternalServerError
     }
   }

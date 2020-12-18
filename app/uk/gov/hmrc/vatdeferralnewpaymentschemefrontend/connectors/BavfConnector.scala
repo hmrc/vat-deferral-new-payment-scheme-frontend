@@ -9,8 +9,8 @@ import javax.inject.Inject
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpReads, HttpResponse}
 import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.model.Bavf._
-import HttpReads.Implicits.readRaw
 import InitRequest.writes
+import HttpReads.Implicits.readRaw
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -42,14 +42,11 @@ class BavfConnector @Inject()(httpClient: HttpClient)(implicit val appConfig: Ap
   def complete(journeyId: String)(
     implicit ec: ExecutionContext,
     hc: HeaderCarrier
-  ): Future[Option[CompleteResponse]] = {
-    import CompleteResponse._
-    import HttpReads.Implicits.readRaw
-
+  ): Future[Option[Account]] = {
     val url = s"${appConfig.bavfApiBaseUrl}/api/complete/$journeyId"
     httpClient.GET[HttpResponse](url).map {
       case r if r.status == 200 =>
-        Some(r.json.as[CompleteResponse])
+        Some(r.json.as[Account])
       case _ =>
         None
     }
