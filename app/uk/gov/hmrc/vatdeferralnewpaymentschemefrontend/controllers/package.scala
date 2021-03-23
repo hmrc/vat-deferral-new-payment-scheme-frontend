@@ -196,10 +196,10 @@ package object controllers {
         logger.warn(s"VDNPS: VATRegistrationDate: ${checkVatRegistrationDate(v, mjs.date)}, length: ${v.length}, format: ${v.replaceAll("[0-9]", "x")}")
         checkVatRegistrationDate(v, mjs.date)
       }
-      case (HmceVatdecOrgService, "PETAXDUESALES", v) =>  {
-        logger.warn(s"VDNPS: PETAXDUESALES: ${v == mjs.latestVatAmount.getOrElse("") }")
-        v == mjs.latestVatAmount.getOrElse("")
-      }
+//      case (HmceVatdecOrgService, "PETAXDUESALES", v) =>  {
+//        logger.warn(s"VDNPS: PETAXDUESALES: ${v == mjs.latestVatAmount.getOrElse("") }")
+//        v == mjs.latestVatAmount.getOrElse("")
+//      }
       case (HmceVatdecOrgService, "PEPDNO", v) => {
         logger.warn(s"VDNPS: PEPDNO: ${v.toLowerCase() == formatLastAccountPeriodMonth(mjs.latestAccountPeriodMonth)}")
         v.toLowerCase() == formatLastAccountPeriodMonth(mjs.latestAccountPeriodMonth)
