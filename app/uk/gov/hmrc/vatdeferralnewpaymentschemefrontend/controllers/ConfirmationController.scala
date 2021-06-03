@@ -60,8 +60,8 @@ class ConfirmationController @Inject()(
       }
       val rpa = regularPaymentAmount(oa, journeySession.numberOfPaymentMonths.getOrElse(11))
       val ps = paymentSummary(
-        formattedPaymentsStartDate(paymentStartDate),
-        journeySession.dayOfPayment.getOrElse((0)),
+        paymentStartDate,
+        journeySession.dayOfPayment.getOrElse(0),
         journeySession.numberOfPaymentMonths.getOrElse(11),
         journeySession.outStandingAmount.getOrElse(BigDecimal(0)),
         firstPaymentAmount(oa, journeySession.numberOfPaymentMonths.getOrElse(11)),

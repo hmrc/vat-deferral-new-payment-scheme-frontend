@@ -14,21 +14,18 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.config.AppConfig
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.viewmodel.Month
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers._
-@import org.joda.time.LocalDate
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.views.helpers.{PageTitle, Money}
-@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.views.html.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.controllers._
+@import uk.gov.hmrc.vatdeferralnewpaymentschemefrontend.views.helpers.Money
+
+@import java.time._
 
 @this(
         govukSummaryList: GovukSummaryList
   )
 
 @(
-    paymentStartDate: String,
+    paymentStartDate: ZonedDateTime,
     dayOfPayment: Int,
     numberOfPayments: Int,
     outstandingAmount: BigDecimal,
@@ -48,7 +45,7 @@
             rows = Seq(
                 SummaryListRow(
                     Key(content = Text(messages("payment.plan.dates.first-payment"))),
-                    Value(content = Text(paymentStartDate))
+                    Value(content = Text(formattedPaymentsStartDate(paymentStartDate)))
                 ),
                 SummaryListRow(
                     Key(content = Text(messages("payment.plan.dates.remaining-payments"))),
@@ -61,13 +58,13 @@
         @govukSummaryList(SummaryList(
             rows = Seq(
                 SummaryListRow(
-                    Key(content = Text(paymentStartDate)),
+                    Key(content = Text(paymentStartDate.formatWithWelshMonth("MMMM yyyy"))),
                     Value(content = Text(Money(firstPaymentAmount)))
                 )
             ) ++
-            {(3 to numberOfPayments + 1).map{ item =>
+            {(1 until numberOfPayments).map{ item =>
                 SummaryListRow(
-                    Key(content = Text({LocalDate.now.withDayOfYear(dayOfPayment).plusMonths(item).toString("MMMM yyyy")})),
+                    Key(content = Text(paymentStartDate.plusMonths(item).formatWithWelshMonth("MMMM yyyy"))),
                     Value(content = Text({Money(regularPaymentAmount)}))
                 )
             }} ++
